@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Builditshell — AI Factory Construction</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --accent: #00d4ff;
+            --accent-glow: rgba(0, 212, 255, 0.35);
+            --gold: #c9a84c;
+            --bg-dark: #0a0a0f;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ── Video Background ── */
+        .video-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .video-bg video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Dark cinematic overlay */
+        .video-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at center, rgba(10,10,15,0.45) 0%, rgba(10,10,15,0.85) 70%, rgba(10,10,15,0.97) 100%),
+                linear-gradient(180deg, rgba(10,10,15,0.3) 0%, transparent 30%, transparent 70%, rgba(10,10,15,0.8) 100%);
+        }
+
+        /* ── Ambient Particles ── */
+        .particles {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) scale(0);
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-10vh) scale(1);
+            }
+        }
+
+        /* ── Grid Lines ── */
+        .grid-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+            background-size: 80px 80px;
+            mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.4) 0%, transparent 70%);
+            -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.4) 0%, transparent 70%);
+        }
+
+        /* ── Main Content ── */
+        .splash {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 800px;
+            padding: 0 2rem;
+            animation: fadeInUp 1.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Logo / Brand */
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 3rem;
+            animation: fadeInUp 1.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+        }
+
+        .brand-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent), #0066ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 30px var(--accent-glow), 0 0 60px rgba(0,102,255,0.15);
+            position: relative;
+        }
+
+        .brand-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: #fff;
+        }
+
+        .brand-icon::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--accent), #0066ff);
+            opacity: 0.5;
+            filter: blur(12px);
+            z-index: -1;
+        }
+
+        .brand-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.65rem;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 0%, #a0a0b0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Headline */
+        .headline {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.2rem, 5.5vw, 4rem);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 1.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+        }
+
+        .headline .gradient-text {
+            background: linear-gradient(135deg, var(--accent) 0%, #7b61ff 50%, var(--accent) 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 4s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Subtext */
+        .subtext {
+            font-size: 1.15rem;
+            font-weight: 300;
+            color: rgba(255,255,255,0.55);
+            line-height: 1.7;
+            margin-bottom: 3rem;
+            max-width: 520px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeInUp 1.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both;
+        }
+
+        /* Status Indicator */
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 28px;
+            border-radius: 100px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.6);
+            animation: fadeInUp 1.8s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.85); }
+        }
+
+        /* Progress bar */
+        .progress-container {
+            margin-top: 2.5rem;
+            animation: fadeInUp 1.8s cubic-bezier(0.16, 1, 0.3, 1) 1s both;
+        }
+
+        .progress-bar {
+            width: 280px;
+            height: 3px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 100px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 30%;
+            border-radius: 100px;
+            background: linear-gradient(90deg, var(--accent), #7b61ff);
+            animation: loading 2.5s ease-in-out infinite;
+        }
+
+        @keyframes loading {
+            0% { transform: translateX(-100%); width: 30%; }
+            50% { width: 60%; }
+            100% { transform: translateX(400%); width: 30%; }
+        }
+
+        .progress-label {
+            margin-top: 1rem;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* ── Decorative Corner Borders ── */
+        .corner {
+            position: fixed;
+            width: 80px;
+            height: 80px;
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0.15;
+        }
+
+        .corner--tl { top: 30px; left: 30px; border-top: 1px solid var(--accent); border-left: 1px solid var(--accent); }
+        .corner--tr { top: 30px; right: 30px; border-top: 1px solid var(--accent); border-right: 1px solid var(--accent); }
+        .corner--bl { bottom: 30px; left: 30px; border-bottom: 1px solid var(--accent); border-left: 1px solid var(--accent); }
+        .corner--br { bottom: 30px; right: 30px; border-bottom: 1px solid var(--accent); border-right: 1px solid var(--accent); }
+
+        /* ── Scan Line Effect ── */
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
+            z-index: 3;
+            pointer-events: none;
+            animation: scan 4s linear infinite;
+            opacity: 0.4;
+        }
+
+        @keyframes scan {
+            0% { top: -2px; }
+            100% { top: 100%; }
+        }
+
+        /* ── Footer ── */
+        .footer {
+            position: fixed;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: 2;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.2);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            animation: fadeInUp 1.8s cubic-bezier(0.16, 1, 0.3, 1) 1.2s both;
+        }
+
+        /* ── Mobile ── */
+        @media (max-width: 600px) {
+            .brand { gap: 10px; margin-bottom: 2rem; }
+            .brand-icon { width: 42px; height: 42px; border-radius: 11px; }
+            .brand-icon svg { width: 22px; height: 22px; }
+            .brand-name { font-size: 1.3rem; }
+            .subtext { font-size: 1rem; }
+            .corner { width: 40px; height: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Video -->
+    <div class="video-bg">
+        <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1920&q=80">
+            <source src="https://cdn.coverr.co/videos/coverr-blue-server-room-with-lights-5765/1080p.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <!-- Ambient Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Grid Overlay -->
+    <div class="grid-overlay"></div>
+
+    <!-- Scan Line -->
+    <div class="scanline"></div>
+
+    <!-- Corner Accents -->
+    <div class="corner corner--tl"></div>
+    <div class="corner corner--tr"></div>
+    <div class="corner corner--bl"></div>
+    <div class="corner corner--br"></div>
+
+    <!-- Main Content -->
+    <main class="splash">
+        <div class="brand">
+            <div class="brand-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18L19.18 7.5 12 10.82 4.82 7.5 12 4.18zM4 9.04l7 3.5V19.6l-7-3.5V9.04zm16 0v7.06l-7 3.5V12.54l7-3.5z"/>
+                </svg>
+            </div>
+            <span class="brand-name">Builditshell</span>
+        </div>
+
+        <h1 class="headline">
+            <span class="gradient-text">AI Factory</span><br>
+            Construction&hellip;
+        </h1>
+
+        <p class="subtext">
+            Our systems are being upgraded with next-generation AI infrastructure.
+            We'll be back online shortly.
+        </p>
+
+        <div class="status">
+            <span class="status-dot"></span>
+            Site is upgrading
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <p class="progress-label">Deploying new architecture</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div class="footer">&copy; 2026 Builditshell &mdash; All rights reserved</div>
+
+    <!-- Particle Generator -->
+    <script>
+        (function() {
+            const container = document.getElementById('particles');
+            const count = 40;
+
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.width = p.style.height = (Math.random() * 2 + 1) + 'px';
+                p.style.animationDuration = (Math.random() * 8 + 6) + 's';
+                p.style.animationDelay = (Math.random() * 10) + 's';
+                container.appendChild(p);
+            }
+        })();
+    </script>
+
+</body>
+</html>
